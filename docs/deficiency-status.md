@@ -18,7 +18,7 @@ When a user changes the status of a deficiency in Salesforce, call this endpoint
 | Field | Required | Notes |
 |---|---|---|
 | `incidentId` | yes | The ZenFire deficiency id. It is sent to you in every incident of the deficiency report (`incidentId`). Store it with the incident in Salesforce. |
-| `status` | yes | The new status. Spelling matches ZenFire; capitalization does not matter (`rejected` works). Allowed today: **Open**, **Rejected**. More can be added on request. |
+| `status` | yes | The new status. Spelling matches ZenFire; capitalization does not matter (`rejected` works). Allowed today: **Open**, **Rejected**, **Resolved**. More can be added on request. |
 | `ticketId` | no, recommended | The ZenFire ticket id. When it is sent, the deficiency is first looked up on that ticket: an id from another ticket is refused, and the answer includes the previous status. |
 
 ## Answers

@@ -59,11 +59,14 @@ test('a deficiency that is not on the given ticket is refused and not touched', 
 test('status matches without case; anything else is refused with the allowed list; DEFICIENCY_STATUSES extends it', async () => {
   assert.equal((await setStatus({ incidentId: '5XFeHeZCzM', status: ' rejected ' }, fakeZenfire(base()))).deficiencyStatus, 'Rejected');
   const bad = await setStatus({ incidentId: '5XFeHeZCzM', status: 'Banana' }, fakeZenfire(base()));
-  assert.equal(bad.httpStatus, 400); assert.deepEqual(bad.allowedStatuses, ['Open', 'Rejected']); assert.match(bad.message, /Allowed: Open, Rejected/);
-  process.env.DEFICIENCY_STATUSES = 'Open,Rejected,Resolved';
-  const more = await setStatus({ incidentId: '5XFeHeZCzM', status: 'resolved' }, fakeZenfire(base()));
+  assert.equal(bad.httpStatus, 400); assert.deepEqual(bad.allowedStatuses, ['Open', 'Rejected', 'Resolved']); assert.match(bad.message, /Allowed: Open, Rejected, Resolved/);
+  const resolved = await setStatus({ incidentId: '5XFeHeZCzM', ticketId: 1936539, status: 'resolved' }, fakeZenfire(base()));
+  assert.equal(resolved.action, 'updated'); assert.equal(resolved.deficiencyStatus, 'Resolved'); assert.equal(resolved.previousStatus, 'Open');
+  process.env.DEFICIENCY_STATUSES = 'Open,Closed';
+  const custom = await setStatus({ incidentId: '5XFeHeZCzM', status: 'closed' }, fakeZenfire(base()));
+  const old = await setStatus({ incidentId: '5XFeHeZCzM', status: 'Resolved' }, fakeZenfire(base()));
   delete process.env.DEFICIENCY_STATUSES;
-  assert.equal(more.deficiencyStatus, 'Resolved');
+  assert.equal(custom.deficiencyStatus, 'Closed'); assert.equal(old.httpStatus, 400); // the setting replaces the default list
 });
 
 test('missing/malformed input -> 400 per field; aliases deficiencyId / newStatus are accepted', async () => {
